@@ -1,0 +1,11 @@
+/.cpcache/
+/.clj-kondo/
+/.lsp/
+/.projectile
+/.Projectile
+/target/
+/dist/
+/build/
+/test-resources/
+photo_2026-02-11_23-40-58.jpg
+.DS_Store

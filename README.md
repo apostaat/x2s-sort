@@ -10,6 +10,14 @@ The X2S sorts folders/files *lexicographically* and, in many cases, by the **dir
 - Optionally **recreates directory entry order** to match the sorted names (important for X2S).
 - Works recursively for a chosen folder.
 
+## Downloads
+
+Prebuilt installers are available on the GitHub Releases page (Windows `.exe`, macOS `.dmg`).
+
+Note: builds are **unsigned**, so Windows SmartScreen and macOS Gatekeeper will show warnings. You can still run them by confirming the prompt.
+
+Release tags are expected in the form `v0.0.1-stable`. The installer uses numeric version `0.0.1` (required by `jpackage`).
+
 ## Quick Start (Linux/macOS)
 
 ### 1) Build & Run (GUI)
@@ -99,4 +107,17 @@ Options:
 
 ---
 
-If you want a Windows `.exe` or a fully self-contained package, I can add a packaging step (jpackage) next.
+## Releasing (maintainers)
+
+Create and push a tag to build installers in GitHub Actions:
+
+```
+git tag v0.0.1-stable
+git push origin v0.0.1-stable
+```
+
+Artifacts will appear in GitHub Releases.
+
+---
+
+If you want signed installers, I can wire up code-signing for Windows and macOS.

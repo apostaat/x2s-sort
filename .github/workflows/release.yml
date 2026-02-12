@@ -1,0 +1,101 @@
+name: build-release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Clojure
+        uses: DeLaGuardo/setup-clojure@12.5
+        with:
+          cli: 1.11.1.1435
+
+      - name: Build uberjar
+        run: clojure -T:build uber
+
+      - name: Prepare icons (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p build/icon.iconset
+          sips -z 16 16 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_16x16.png
+          sips -z 32 32 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_16x16@2x.png
+          sips -z 32 32 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_32x32.png
+          sips -z 64 64 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_32x32@2x.png
+          sips -z 128 128 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_128x128.png
+          sips -z 256 256 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_128x128@2x.png
+          sips -z 256 256 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_256x256.png
+          sips -z 512 512 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_256x256@2x.png
+          sips -z 512 512 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_512x512.png
+          sips -z 1024 1024 assets/xduoo-x2s-screen.jpg --out build/icon.iconset/icon_512x512@2x.png
+          iconutil -c icns build/icon.iconset -o build/icon.icns
+
+      - name: Prepare icons (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install imagemagick -y
+          magick convert assets/xduoo-x2s-screen.jpg -define icon:auto-resize=256,128,64,48,32,16 build/icon.ico
+          choco install wixtoolset -y
+
+      - name: Package (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          jpackage \
+            --type dmg \
+            --name x2s-sort \
+            --app-version 0.0.1 \
+            --input target \
+            --main-jar x2s-sort.jar \
+            --dest dist \
+            --icon build/icon.icns \
+            --vendor apostaat
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          jpackage \
+            --type exe \
+            --name x2s-sort \
+            --app-version 0.0.1 \
+            --input target \
+            --main-jar x2s-sort.jar \
+            --dest dist \
+            --icon build/icon.ico \
+            --win-dir-chooser \
+            --win-menu \
+            --win-shortcut \
+            --vendor apostaat
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: x2s-sort-${{ runner.os }}
+          path: dist/*
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*
