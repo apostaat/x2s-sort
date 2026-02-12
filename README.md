@@ -16,7 +16,7 @@ Prebuilt installers are available on the GitHub Releases page (Windows `.exe`, m
 
 Note: builds are **unsigned**, so Windows SmartScreen and macOS Gatekeeper will show warnings. You can still run them by confirming the prompt.
 
-Release tags are expected in the form `v0.0.2-stable`. The installer uses numeric version `0.0.2` (required by `jpackage`).
+Release tags are expected in the form `v1.0.0`. The installer uses numeric version `1.0.0` (required by `jpackage`).
 
 ## Quick Start (Linux/macOS)
 
@@ -112,8 +112,8 @@ Options:
 Create and push a tag to build installers in GitHub Actions:
 
 ```
-git tag v0.0.2-stable
-git push origin v0.0.2-stable
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
 Artifacts will appear in GitHub Releases.

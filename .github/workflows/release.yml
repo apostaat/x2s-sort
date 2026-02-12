@@ -59,7 +59,7 @@ jobs:
           jpackage \
             --type dmg \
             --name x2s-sort \
-            --app-version 0.0.2 \
+            --app-version 1.0.0 \
             --input target \
             --main-jar x2s-sort.jar \
             --dest dist \
@@ -72,7 +72,7 @@ jobs:
           jpackage \
             --type exe \
             --name x2s-sort \
-            --app-version 0.0.2 \
+            --app-version 1.0.0 \
             --input target \
             --main-jar x2s-sort.jar \
             --dest dist \
