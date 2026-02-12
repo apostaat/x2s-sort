@@ -6,6 +6,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
@@ -64,7 +67,7 @@ jobs:
           jpackage \
             --type dmg \
             --name x2s-sort \
-            --app-version 1.0.1 \
+            --app-version 1.1.1 \
             --input target \
             --main-jar x2s-sort.jar \
             --dest dist \
@@ -78,7 +81,7 @@ jobs:
           jpackage `
             --type exe `
             --name x2s-sort `
-            --app-version 1.0.1 `
+            --app-version 1.1.1 `
             --input target `
             --main-jar x2s-sort.jar `
             --dest dist `
