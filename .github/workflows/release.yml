@@ -59,7 +59,7 @@ jobs:
           jpackage \
             --type dmg \
             --name x2s-sort \
-            --app-version 1.0.0 \
+            --app-version 1.0.1 \
             --input target \
             --main-jar x2s-sort.jar \
             --dest dist \
@@ -68,18 +68,19 @@ jobs:
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          jpackage \
-            --type exe \
-            --name x2s-sort \
-            --app-version 1.0.0 \
-            --input target \
-            --main-jar x2s-sort.jar \
-            --dest dist \
-            --icon build/icon.ico \
-            --win-dir-chooser \
-            --win-menu \
-            --win-shortcut \
+          jpackage `
+            --type exe `
+            --name x2s-sort `
+            --app-version 1.0.1 `
+            --input target `
+            --main-jar x2s-sort.jar `
+            --dest dist `
+            --icon build/icon.ico `
+            --win-dir-chooser `
+            --win-menu `
+            --win-shortcut `
             --vendor apostaat
 
       - name: Upload artifacts
