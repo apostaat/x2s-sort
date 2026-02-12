@@ -48,9 +48,14 @@ jobs:
 
       - name: Prepare icons (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          choco install imagemagick -y
-          magick convert assets/xduoo-x2s-screen.jpg -define icon:auto-resize=256,128,64,48,32,16 build/icon.ico
+          New-Item -ItemType Directory -Force build | Out-Null
+          if (-not (Get-Command magick -ErrorAction SilentlyContinue)) {
+            choco install imagemagick -y
+          }
+          magick assets/xduoo-x2s-screen.jpg -define icon:auto-resize=256,128,64,48,32,16 build/icon.ico
+          if (-not (Test-Path build/icon.ico)) { throw "icon.ico was not created" }
           choco install wixtoolset -y
 
       - name: Package (macOS)
