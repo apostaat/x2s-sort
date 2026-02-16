@@ -76,25 +76,22 @@ ABR 02 - ...
 ABR 10 - ...
 ```
 
-When **Recreate order** is enabled, the program rebuilds the directory entry order so players like xDuoo X2S follow the intended sequence.
+The tool also recreates directory entry order by default, so players like xDuoo X2S follow the intended sequence.
 
 ## GUI Usage
 
 1. Click **Browse** and choose a folder (e.g. your `music` folder on the SD card).
-2. Optionally enable:
-   - **Dry run**: show planned changes without applying
-   - **Recreate order**: fixes devices that ignore sorting
-3. Click **Run**.
+2. Click **Run**.
 
 ## CLI Usage
 
 ```
-clojure -M -m x2s-sort.core /path/to/folder --reorder
+clojure -M -m x2s-sort.core /path/to/folder
 ```
 
 Options:
 - `--dry-run` — preview changes only
-- `--reorder` — rebuild directory entry order
+- `--no-reorder` — disable directory entry order recreation (enabled by default)
 - `--gui` — launch GUI (default when no args)
 
 ## Safety Notes

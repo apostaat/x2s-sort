@@ -1,6 +1,6 @@
 (ns x2s-sort.gui
   (:require [x2s-sort.rename :as rename])
-  (:import (javax.swing JFrame JPanel JButton JLabel JTextField JCheckBox JTextArea JScrollPane JFileChooser SwingUtilities UIManager BorderFactory)
+  (:import (javax.swing JFrame JPanel JButton JLabel JTextField JTextArea JScrollPane JFileChooser SwingUtilities UIManager BorderFactory)
            (java.awt BorderLayout GridBagLayout GridBagConstraints Insets Font Color)
            (java.awt.event ActionListener)))
 
@@ -56,24 +56,21 @@
       (.. chooser getSelectedFile getAbsolutePath))))
 
 (defn- start-rename!
-  [root dry-run? reorder? log status run-btn]
+  [root log status run-btn]
   (future
     (try
       (set-enabled! run-btn false)
       (set-status! status "Running...")
       (append-log! log (str "Folder: " root))
-      (let [{:keys [operations reordered-dirs]} (rename/rename-tree! root {:dry-run? dry-run? :reorder? reorder?})]
+      (let [{:keys [operations reordered-dirs]} (rename/rename-tree! root {:dry-run? false :reorder? true})]
         (if (seq operations)
           (do
-            (append-log! log (if dry-run? "Planned renames:" "Renamed:"))
+            (append-log! log "Renamed:")
             (doseq [{:keys [from to]} operations]
               (append-log! log (str from " -> " to)))
             (append-log! log (str "Total: " (count operations))))
-          (if reorder?
-            (append-log! log "No renames.")
-            (append-log! log "Nothing to rename.")))
-        (when reorder?
-          (append-log! log (str "Reordered directories: " reordered-dirs))))
+          (append-log! log "No renames."))
+        (append-log! log (str "Reordered directories: " reordered-dirs)))
       (set-status! status "Done.")
       (catch Exception e
         (append-log! log (str "Error: " (.getMessage e)))
@@ -97,15 +94,15 @@
            path-field (doto (JTextField. 20)
                         (.setEditable false))
            browse-btn (JButton. "Browse")
-           dry-run (JCheckBox. "Dry run (no changes)")
-           reorder (JCheckBox. "Recreate order (players ignore sort)")
            run-btn (JButton. "Run")
            status (JLabel. "Ready")
            log (doto (JTextArea. 6 28)
                  (.setEditable false)
-                 (.setFont (Font. Font/MONOSPACED Font/PLAIN 12)))
+                 (.setLineWrap true)
+                 (.setWrapStyleWord true)
+                 (.setFont (Font. Font/MONOSPACED Font/PLAIN 10)))
            scroll (JScrollPane. log)]
-       (apply-theme! [path-label path-field browse-btn dry-run reorder run-btn status log])
+       (apply-theme! [path-label path-field browse-btn run-btn status])
        (set! (.insets c) (Insets. 4 4 4 4))
        (set! (.anchor c) GridBagConstraints/WEST)
 
@@ -114,13 +111,12 @@
        (.setBackground frame (:bg theme))
 
        (.setBackground log (:bg theme))
+       (.setForeground log (:fg theme))
        (.setBackground (.getViewport scroll) (:bg theme))
+       (.setHorizontalScrollBarPolicy scroll JScrollPane/HORIZONTAL_SCROLLBAR_NEVER)
+       (.setVerticalScrollBarPolicy scroll JScrollPane/VERTICAL_SCROLLBAR_NEVER)
        (.setCaretColor log (:accent theme))
        (.setBorder scroll (BorderFactory/createLineBorder (:accent theme) 1))
-
-       (doseq [cb [dry-run reorder]]
-         (.setOpaque cb true)
-         (.setBackground cb (:panel theme)))
 
        (doseq [btn [browse-btn run-btn]]
          (.setFocusPainted btn false)
@@ -143,12 +139,8 @@
        (.add panel browse-btn c)
 
        (set! (.gridx c) 1) (set! (.gridy c) 1) (set! (.gridwidth c) 2)
-       (.add panel dry-run c)
-       (set! (.gridx c) 1) (set! (.gridy c) 2)
-       (.add panel reorder c)
-       (set! (.gridx c) 1) (set! (.gridy c) 3)
        (.add panel run-btn c)
-       (set! (.gridx c) 1) (set! (.gridy c) 4)
+       (set! (.gridx c) 1) (set! (.gridy c) 2)
        (.add panel status c)
 
        (.add frame panel BorderLayout/NORTH)
@@ -166,7 +158,7 @@
                                (let [root (.getText path-field)]
                                  (if (or (nil? root) (empty? root))
                                    (append-log! log "Please select a folder first.")
-                                   (start-rename! root (.isSelected dry-run) (.isSelected reorder) log status run-btn))))))
+                                   (start-rename! root log status run-btn))))))
 
        (doto frame
          (.setDefaultCloseOperation JFrame/EXIT_ON_CLOSE)

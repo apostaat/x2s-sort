@@ -1,4 +1,5 @@
 (ns x2s-sort.core
+  (:gen-class)
   (:require [clojure.string :as str]
             [x2s-sort.gui :as gui]
             [x2s-sort.rename :as rename]))
@@ -6,18 +7,18 @@
 (defn- usage []
   (str/join
    "\n"
-   ["Usage: clojure -M -m x2s-sort.core [--gui] [--dry-run] [--reorder]"
-    "       clojure -M -m x2s-sort.core <path> [--dry-run] [--reorder]"
+   ["Usage: clojure -M -m x2s-sort.core [--gui] [--dry-run] [--no-reorder]"
+    "       clojure -M -m x2s-sort.core <path> [--dry-run] [--no-reorder]"
     ""
     "Options:"
     "  --dry-run   Print planned renames without changing files"
-    "  --reorder   Recreate directory entry order (for players that ignore sorting)"
+    "  --no-reorder   Disable directory order recreation (enabled by default)"
     "  --gui       Choose a folder via dialog (default if no args)"]))
 
 (defn- parse-args [args]
   (loop [args args
          opts {:dry-run? false
-               :reorder? false
+               :reorder? true
                :gui? false
                :path nil}]
     (if (empty? args)
@@ -27,6 +28,7 @@
           (= arg "--dry-run") (recur (rest args) (assoc opts :dry-run? true))
           (= arg "--gui") (recur (rest args) (assoc opts :gui? true))
           (= arg "--reorder") (recur (rest args) (assoc opts :reorder? true))
+          (= arg "--no-reorder") (recur (rest args) (assoc opts :reorder? false))
           (= arg "--help") (recur (rest args) (assoc opts :help? true))
           (str/starts-with? arg "-") (recur (rest args) (assoc opts :unknown arg))
           :else (if (:path opts)
