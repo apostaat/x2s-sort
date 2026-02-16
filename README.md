@@ -2,6 +2,8 @@
 
 A small utility to fix album/track ordering on the **xDuoo X2S** player.
 
+<img width="765" height="463" alt="image" src="https://github.com/user-attachments/assets/d927fd58-5341-4bea-93cf-d3c1b5fbd712" />
+
 ![xDuoo X2S sorting issue](assets/xduoo-x2s-screen.jpg)
 
 The X2S sorts folders/files *lexicographically* and, in many cases, by the **directory entry order** (FAT/exFAT), not strictly by name. This tool:
